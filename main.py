@@ -21,6 +21,7 @@ parser = OptionParser()
 parser.add_option("-u", "--url")
 parser.add_option("-t", "--tail", default=24)
 parser.add_option("-d", "--host", default="http://localhost:8080")
+parser.add_option("-p", "--port", default=8080)
 
 (options, args) = parser.parse_args()
 
@@ -75,7 +76,7 @@ def play(file):
     return static_file(file, root="./files")
 
 def thread0():
-    run(app, host='0.0.0.0', port=8080)
+    run(app, host='0.0.0.0', port=options.port)
 
 def thread1():
     while True: 
