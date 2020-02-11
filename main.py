@@ -20,6 +20,7 @@ except:
 parser = OptionParser()
 parser.add_option("-u", "--url")
 parser.add_option("-t", "--tail", default=24)
+parser.add_option("-d", "--host", default="http://localhost:8080")
 
 (options, args) = parser.parse_args()
 
@@ -64,7 +65,7 @@ def greet(start,end):
 #EXT-X-MEDIA-SEQUENCE:0"""
     for row in rows:
         out += "#EXTINF:%s"%row["duration"]+"\n"
-        out += "http://localhost:8080/play/"+row["name"]+"\n"
+        out += options.host+"/play/"+row["name"]+"\n"
     out += ("#EXT-X-ENDLIST")
     conn.close()
     return out
