@@ -1,13 +1,24 @@
 # video stream recorder
 live video stream recorder / vod service provider
 
+requires python3
+
+setup:
+```
+pip3 install --requirement requirements.txt
+```
+
 downloader:
 ```
-./vod -bind :8080 -db /mnt/channelname.db -ttl 24h -name channelname -root /mnt/disk1 -url http://your/hls/stream.m3u8
+./main.py --url http://full/url/with/m3u8 --tail 24
+
+url = m3u8 url to process
+tail = how many hours keep
 ```
 
 watch recorder stream via your favorite video player:
 ```
-http://youripaddress:8080/channelname/timeshift_abs_mono-[timestamp].m3u8
+http://youripaddress:8080/start/<timestamp>/300
 ```
 replace "{timestamp}" to localtime unix timestamp (https://www.epochconverter.com/)
+replace 300 with how long video is (if you dont know, keep 300)
