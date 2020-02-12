@@ -55,14 +55,14 @@ app = Bottle()
 @app.route('/start/<start>/<end>')
 def greet(start,end):
     _end = time.time()+(int(end)*60)
-    if int(start) != 0 {
+    if int(start) != 0:
         _end = start + (int(end)*60)
-    }
-    out = ""
     conn = sqlite3.connect("files.sqlite3")
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
-    rows = cursor.execute("select * from files where downloadtime >= ? and downloadtime <= ?", (start, _end)
+    rows = cursor.execute("select * from files where downloadtime >= ? and downloadtime <= ?", (start, _end))
+
+    out = ""
     out += """#EXTM3U
 #EXT-X-PLAYLIST-TYPE:VOD
 #EXT-X-TARGETDURATION:50
