@@ -29,6 +29,13 @@ if options.url is None:
     print("set flag --url http://stream.m3u8")
     sys.exit(1)
 
+data = m3u8.load(options.url)
+if data.playlists:
+    # print(data.uri)
+    for f in data.playlists:
+        print(f.uri)
+
+sys.exit(1)
 
 conn = sqlite3.connect("files.sqlite3")
 conn.row_factory = sqlite3.Row
