@@ -21,7 +21,7 @@ http://youripaddress:8080/start/<timestamp>/300/stream.m3u8
 
 or with normal full date with seconds:
 
-http://youripaddress:8080/start/20191225150000/vod.m3u8
+http://youripaddress:8080/start/20191225150000/300/vod.m3u8
 
 ```
 replace "{timestamp}" to localtime unix timestamp (https://www.epochconverter.com/)
