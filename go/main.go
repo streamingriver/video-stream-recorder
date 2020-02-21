@@ -48,7 +48,43 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.HandleFunc("/start/{start}/{limit}/stream.m3u8", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/live/stream.m3u8", func(w http.ResponseWriter, r *http.Request) {
+
+		utc := r.URL.Query().Get("utc")
+		if utc != "" {
+			// w.Header().Set("Location", "/")
+			vod1(w, r)
+			return
+		}
+
+		out := "#EXTM3U\n"
+		out += "#EXT-X-TARGETDURATION:2\n"
+		out += "#EXT-X-VERSION:4\n"
+
+		items := database_last_5()
+
+		if len(items) <= 0 {
+			return
+		}
+
+		last := items[len(items)-1]
+
+		out += fmt.Sprintf("#EXT-X-MEDIA-SEQUENCE:%d\n", last.ID)
+
+		for _, item := range items {
+			out += fmt.Sprintf("#EXTINF:%f\n", item.Len)
+			out += fmt.Sprintf("%s\n", item.Name)
+		}
+
+		w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+		w.Header().Set("Content-Lenght", fmt.Sprintf("%d", len(out)))
+		w.Write([]byte(out))
+
+	})
+
+	router.HandleFunc("/live/{ts:.+}", serve_ts_file)
+
+	router.HandleFunc("/start/{start}/{limit}/vod.m3u8", func(w http.ResponseWriter, r *http.Request) {
 
 		varz := mux.Vars(r)
 
@@ -58,7 +94,16 @@ func main() {
 		out += "#EXT-X-VERSION:4\n"
 		out += "#EXT-X-MEDIA-SEQUENCE:0\n"
 
-		items := database_get(varz["start"], varz["limit"])
+		t, err := time.Parse("20060102150405", varz["start"])
+		if err != nil {
+			perr, ok := err.(*time.ParseError)
+			log.Printf("error %v %v", perr, ok)
+			return
+		}
+		start := fmt.Sprintf("%d", t.Unix())
+		println(start)
+
+		items := database_get(start, varz["limit"])
 
 		for _, item := range items {
 			out += fmt.Sprintf("#EXTINF:%f\n", item.Len)
@@ -72,21 +117,55 @@ func main() {
 		w.Write([]byte(out))
 	})
 
-	router.HandleFunc("/start/{start}/{limit}/{ts:.+}", func(w http.ResponseWriter, r *http.Request) {
-		varz := mux.Vars(r)
-		w.Header().Set("Content-Type", "text/vnd.trolltech.linguist")
-		b, err := ioutil.ReadFile(fmt.Sprintf("./files/%s", varz["ts"]))
-		if err != nil {
-			log.Printf("error %v", err)
-			return
-		}
-		w.Header().Set("Content-Length", fmt.Sprintf("%d", len(b)))
-		w.Write(b)
+	router.HandleFunc("/start/{start}/{limit}/stream.m3u8", vod1)
 
-	})
+	router.HandleFunc("/start/{start}/{limit}/{ts:.+}", serve_ts_file)
 
 	log.Printf("Starting server on %v", *flagBindTo)
 	log.Fatal(http.ListenAndServe(*flagBindTo, router))
+}
+
+func vod1(w http.ResponseWriter, r *http.Request) {
+
+	varz := mux.Vars(r)
+
+	utc := r.URL.Query().Get("utc")
+	if utc != "" {
+		varz["start"] = utc
+		varz["limit"] = "300"
+	}
+
+	out := "#EXTM3U\n"
+	out += "#EXT-X-PLAYLIST-TYPE:VOD\n"
+	out += "#EXT-X-TARGETDURATION:20\n"
+	out += "#EXT-X-VERSION:4\n"
+	out += "#EXT-X-MEDIA-SEQUENCE:0\n"
+
+	items := database_get(varz["start"], varz["limit"])
+
+	for _, item := range items {
+		out += fmt.Sprintf("#EXTINF:%f\n", item.Len)
+		out += fmt.Sprintf("%s\n", item.Name)
+	}
+
+	out += "#EXT-X-ENDLIST\n"
+
+	w.Header().Set("Content-Type", "application/vnd.apple.mpegurl")
+	w.Header().Set("Content-Lenght", fmt.Sprintf("%d", len(out)))
+	w.Write([]byte(out))
+}
+
+func serve_ts_file(w http.ResponseWriter, r *http.Request) {
+	varz := mux.Vars(r)
+	w.Header().Set("Content-Type", "text/vnd.trolltech.linguist")
+	b, err := ioutil.ReadFile(fmt.Sprintf("./files/%s", varz["ts"]))
+	if err != nil {
+		log.Printf("error %v", err)
+		return
+	}
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", len(b)))
+	w.Write(b)
+
 }
 
 func fetcher() {

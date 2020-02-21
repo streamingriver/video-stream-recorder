@@ -14,6 +14,7 @@ import (
 )
 
 type DatabaseItem struct {
+	ID   uint64
 	Name string
 	Len  float64
 	T    int64
@@ -37,13 +38,50 @@ func database_init() {
 }
 
 func database_store(item *DatabaseItem) {
-	encoded, _ := json.Marshal(item)
+
 	database.Update(func(tx *bbolt.Tx) error {
 		bucket := tx.Bucket(dbbucket)
+		ID, _ := bucket.NextSequence()
+		item.ID = ID
+		encoded, _ := json.Marshal(item)
 		bucket.Put(itob(int(item.T)), encoded)
 		return nil
 
 	})
+}
+
+func database_last_5() []*DatabaseItem {
+
+	var rt []*DatabaseItem
+	var tmp []*DatabaseItem
+
+	database.View(func(tx *bbolt.Tx) error {
+		bucket := tx.Bucket(dbbucket)
+		cursor := bucket.Cursor()
+
+		n := 0
+		for k, v := cursor.Last(); k != nil; k, v = cursor.Prev() {
+			if n >= 7 {
+				break
+			}
+			n++
+			var item *DatabaseItem
+			err := json.Unmarshal(v, &item)
+			if err != nil {
+				log.Printf("error %v", err)
+				continue
+			}
+			tmp = append(tmp, item)
+
+		}
+		return nil
+	})
+
+	for i := len(tmp) - 1; i > 0; i-- {
+		rt = append(rt, tmp[i])
+	}
+
+	return rt
 }
 
 func database_get(s, l string) []*DatabaseItem {
