@@ -9,6 +9,11 @@ url = m3u8 url to process
 tail = how many hours keep
 ```
 
+wath live (last downloaded files):
+```
+http://youripaddress:8080/live/stream.m3u8
+```
+
 watch recorder stream via your favorite video player:
 ```
 http://youripaddress:8080/start/<timestamp>/300/stream.m3u8
