@@ -23,10 +23,17 @@ var (
 	flagBindTo = flag.String("bind-to", ":8080", "bind to ip:port")
 
 	flagDebug = flag.Bool("debug", false, "")
+
+	flagVersion = flag.Bool("version", false, "show version")
 )
 
 func main() {
 	flag.Parse()
+
+	if *flagVersion {
+		println("v0.2")
+		return
+	}
 
 	if *flagURL == "" {
 		log.Printf("Set url to fetch: ./app --url [url-here]")
