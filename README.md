@@ -1,7 +1,7 @@
 # video stream recorder
 hls live video stream recorder / vod service provider
 
-check https://github.com/streamingriver/video-stream-recorder/releases
+for latest version check https://github.com/streamingriver/video-stream-recorder/releases
 
 downloader:
 ```
