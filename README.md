@@ -1,6 +1,8 @@
 # video stream recorder
 hls live video stream recorder / vod service provider
 
+chekc https://github.com/streamingriver/video-stream-recorder/releases
+
 downloader:
 ```
 ./vsr --url http://full/url/with/m3u8 --tail 24
