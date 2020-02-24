@@ -1,4 +1,0 @@
-pysqlite3
-m3u8
-cacheout
-bottle

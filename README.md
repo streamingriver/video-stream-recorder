@@ -1,5 +1,5 @@
 # video stream recorder
-live video stream recorder / vod service provider
+hls live video stream recorder / vod service provider
 
 downloader:
 ```
@@ -26,3 +26,6 @@ http://youripaddress:8080/start/20191225150000/300/vod.m3u8
 ```
 replace "{timestamp}" to localtime unix timestamp (https://www.epochconverter.com/)
 replace 300 with how long video is (if you dont know, keep 300)
+
+
+
