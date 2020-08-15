@@ -10,7 +10,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/etcd-io/bbolt"
+	"go.etcd.io/bbolt"
 )
 
 type DatabaseItem struct {
